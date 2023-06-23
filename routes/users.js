@@ -323,11 +323,12 @@ router.post("/reset", async (req, res) => {
 });
 
 
-router.post('/password-reset', async (req, res) => {
+router.post('/password', async (req, res) => {
 
 
   try {
     const users = await userModel.findOne({ email: req.body.email });
+    console.log(users)
     console.log("reset : " + req.body.password);
     const token = req.body.token;
     console.log(token)
@@ -342,7 +343,7 @@ router.post('/password-reset', async (req, res) => {
     const filter = { email: userId };
     const update = { password: hashedPassword };
 
-    const doc = await userModel.findByIdAndUpdate(filter, update);
+    const doc = await userModel.findOneAndUpdate(filter, update);
     console.log("test");
     console.log(doc);
 
@@ -357,7 +358,6 @@ router.post('/password-reset', async (req, res) => {
     })
   }
 })
-
 
 router.post('/active', async (req, res) => {
   try {
