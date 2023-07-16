@@ -359,42 +359,41 @@ router.post('/password', async (req, res) => {
   }
 })
 
-router.post('/active', async (req, res) => {
-  try {
-    console.log(req.body)
-    const { token } = req.body;
-    console.log("token:", token);
-
-    if (!token) {
-      return res.status(400).json({ message: 'Token is missing' });
-    }
-
-    let decodedToken;
+  router.post('/active', async (req, res) => {
     try {
-      decodedToken = jwt.verify(token, process.env.secretkey);
+      console.log(req.body)
+      const { token } = req.body;
+      console.log("token:", token);
+
+      if (!token) {
+        return res.status(400).json({ message: 'Token is missing' });
+      }
+
+      let decodedToken;
+      try {
+        decodedToken = jwt.verify(token, process.env.secretkey);
+      } catch (error) {
+        return res.status(400).json({ message: 'Invalid token' });
+      }
+
+      const userId = decodedToken.userId;
+      console.log("userId:", userId);
+
+      const filter = { email: userId };
+      const update = { active: true };
+
+      const doc = await userModel.findOneAndUpdate(filter, update);
+      console.log("doc:", doc);
+
+      return res.status(200).json({ message: 'Account activated successfully' });
     } catch (error) {
-      return res.status(400).json({ message: 'Invalid token' });
+      console.error(error);
+      return res.status(500).json({ message: 'Internal Server Error' });
     }
-
-    const userId = decodedToken.userId;
-    console.log("userId:", userId);
-
-    const filter = { email: userId };
-    const update = { active: true };
-
-    const doc = await userModel.findOneAndUpdate(filter, update);
-    console.log("doc:", doc);
-
-    return res.status(200).json({ message: 'Account activated successfully' });
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Internal Server Error' });
-  }
-});
+  });
 
 
 router.get('/:id/urlcounts', async (req, res) => {
-
   try {
 
     const token = req.headers['authorization'].split(" ")[1];
